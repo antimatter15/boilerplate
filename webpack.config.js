@@ -7,7 +7,7 @@ const IS_DEV = (process.env.NODE_ENV !== 'production');
 const IS_BUILD = !IS_DEV;
 
 module.exports = {
-	devtool: 'eval-cheap-module-source-map',
+	devtool: IS_DEV ? 'eval-cheap-module-source-map' : false,
 	cache: true,
 	entry: {
 		bundle: IS_DEV ? [
@@ -31,21 +31,14 @@ module.exports = {
 		new HtmlWebpackPlugin({
 			title: 'Boilerplate',
 		}),
-		new webpack.NamedModulesPlugin(),
-		
+		IS_DEV && new webpack.NamedModulesPlugin(),
 		IS_DEV && new webpack.HotModuleReplacementPlugin(),
 
 		IS_BUILD && new CleanWebpackPlugin(['dist']),
 		IS_BUILD && new webpack.DefinePlugin({
-			'process.env': {
-				NODE_ENV: JSON.stringify('production')
-			}
+  			'process.env.NODE_ENV': JSON.stringify('production')
 		}),
-		IS_BUILD && new webpack.optimize.UglifyJsPlugin({
-			compressor: {
-				warnings: false
-			}
-		})
+		IS_BUILD && new webpack.optimize.UglifyJsPlugin()
 	].filter(k => k),
 	module: {
 		rules: [
@@ -57,7 +50,7 @@ module.exports = {
 					options: {
 						cacheDirectory: true,
 						"presets": [["env", {"modules": false}], "react", "stage-0"],
-						"plugins": ["react-hot-loader/babel"]
+						"plugins": IS_DEV ? ["react-hot-loader/babel"] : []
 					}
 				}
 			},
@@ -73,5 +66,12 @@ module.exports = {
 	},
 	node: {
 		'fs': 'empty',
+	},
+	devServer: {
+	    // contentBase: config.output.publicPath,
+	    hot: true,
+	    host: 'localhost',
+	    port: 1995,
+	    historyApiFallback: true
 	}
 }

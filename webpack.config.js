@@ -29,7 +29,7 @@ module.exports = {
 
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Boilerplate',
+            template: './src/index.html',
         }),
         IS_DEV && new webpack.NamedModulesPlugin(),
         IS_DEV && new webpack.HotModuleReplacementPlugin(),
@@ -72,6 +72,10 @@ module.exports = {
         hot: true,
         host: 'localhost',
         port: 1995,
-        historyApiFallback: true
+        historyApiFallback: {
+            rewrites: [
+                { from: /./, to: '/index.html' }
+            ]
+        }
     }
 }
